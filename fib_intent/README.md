@@ -406,4 +406,4 @@ python module fibonacci ! in
 end python module fibonacci
 ```
 
-The modified signature file can now be used to teach `f2py` what the interface to the subroutine should be, without never having to modify the source code.
+The modified signature file can now be used to teach `f2py` what the interface to the subroutine should be, without ever having to modify the source code.
