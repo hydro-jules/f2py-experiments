@@ -138,7 +138,7 @@ import fibonacci
 import numpy as np
 
 n = 7
-a = np.array([1, 1, 1, 1, 1, 1, 1], order='F', dtype=float)
+a = np.zeros((n,), order='F', dtype=np.float32) + 1
 
 # first option: let f2py infer the value of 'n' from the dimension of 'a'
 print('First option:')
@@ -225,7 +225,7 @@ import numpy as np
 
 
 n = 7
-m = np.array([1, 1, 1, 1, 1, 1, 1], order='F', dtype=np.float32)
+m = np.zeros((n,), order='F', dtype=np.float32) + 1
 
 print('First call of the subroutine:')
 z = fibonacci.fib.series(m, n=n)
@@ -407,3 +407,102 @@ end python module fibonacci
 ```
 
 The modified signature file can now be used to teach `f2py` what the interface to the subroutine should be, without ever having to modify the source code.
+
+
+### 6 - Getting the function call to return the intent(inout) variable(s) alongside the intent(out) variable(s)
+
+When passing a variable as an argument with `intent(inout)` in the Fortran subroutine, the variable is modified in place. If one wants to get the call to the Fortran subroutine to return a pointer to the modified array, `f2py` defines a special `intent(in,out)` to do so. Again, similar to section 5, this can be done by adding comment lines in the Fortran source code or by modifying the signature file.
+
+The modified source code:
+```fortran
+! file: fib.f90
+
+module fib
+    contains
+        subroutine series(n, A, M, Z)
+            ! calculates first n elements of the Fibonacci series,
+            ! adds it to the existing input/output array, and adds the
+            ! input array to it
+            implicit none
+
+            integer, intent(in) :: n
+            real, intent(in), dimension(n) :: A
+            !f2py depend(n) A
+            real, intent(inout), dimension(n) :: M
+            !f2py intent(in,out,inplace) M
+            !f2py depend(n) M
+            real, intent(out), dimension(n) :: Z
+            !f2py depend(n) Z
+            integer :: i
+
+            do i = 1, n
+                if (i == 1) then
+                    Z(i) = 0.0
+                else if (i == 2) then
+                    Z(i) = 1.0
+                else
+                    Z(i) = Z(i - 2) + Z(i - 1)
+                end if
+            end do
+
+            do i = 1, n
+                M(i) = M(i) + A(i) + Z(i)
+            end do
+
+        end subroutine series
+end module fib
+``` 
+
+If the source code is modified, the automatically-generated source file will look like this:
+
+```
+! file: fib.pyf
+
+python module fibonacci ! in 
+    interface  ! in :fibonacci
+        module fib ! in :fibonacci:fib.f90
+            subroutine series(n,a,m,z) ! in :fibonacci:fib.f90:fib
+                integer intent(in) :: n
+                real dimension(n),intent(in),depend(n) :: a
+                real dimension(n),intent(in,out),depend(n) :: m
+                real dimension(n),intent(out),depend(n) :: z
+            end subroutine series
+        end module fib
+    end interface 
+end python module fibonacci
+```
+
+This is also how a signature file should be modified if the source code cannot be edited.
+
+Once the static library is generated, this is how it will behave with Python:
+```python
+import fibonacci
+import numpy as np
+
+n = 7
+
+a = np.zeros((n,), order='F', dtype=np.float32) + 1
+m = np.zeros((n,), order='F', dtype=np.float32) + 1
+
+m_, z = fibonacci.fib.series(n, a, m)
+
+print('The array "m" and its memory address')
+print(m)
+print(hex(id(m)))
+
+print('The array "m_" and its memory address')
+print(m_)
+print(hex(id(m_)))
+```
+
+This Python script will return:
+```
+The array "m" and its memory address
+[ 2.  3.  3.  4.  5.  7. 10.]
+0x1014bb760
+The array "m_" and its memory address
+[ 2.  3.  3.  4.  5.  7. 10.]
+0x1014bb760
+```
+
+As one can notice, the address in memory of the variables `m` and `m_` is the same, i.e. `m_` is an alias for `m`.
