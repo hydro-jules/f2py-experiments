@@ -56,7 +56,7 @@ We can see that the module to be imported in Python is named `fibonacci`, that i
 Now, we compile the Fortran program using the unmodified signature file that we have just created. The following instruction will generate a static library fibonacci.so:
 ```bash
 python -m numpy.f2py -c fib.pyf fib.f90
-
+```
 
 Finally we can use this static library and import it just like a normal Python module:
 
