@@ -1,0 +1,2 @@
+# ignore shared library files because they are OS and Python version specific
+*.so
