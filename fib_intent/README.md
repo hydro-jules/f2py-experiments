@@ -134,6 +134,7 @@ end python module fibonacci
 Once the static library is compiled, we can use this interface to call the Fortran subroutine. Note that we use the keyword argument `order='F'` to create a Fortran-contiguous array that will be given as the input. The default behaviour of `numpy` is to create a C-contiguous array, so is not given a Fortran-contiguous array, `f2py` may create a copy of this array, which can become a problem for large multi-dimensional arrays. So it is safer to specify the order explicitly. 
 
 ```python
+# file: test.py
 import fibonacci
 import numpy as np
 
@@ -220,6 +221,7 @@ end python module fibonacci
 
 When the static library is called in Python, we can see that the argument with intent(inout) initial values are used and modified:
 ```python
+# file: test.py
 import fibonacci
 import numpy as np
 
@@ -476,6 +478,7 @@ This is also how a signature file should be modified if the source code cannot b
 
 Once the static library is generated, this is how it will behave with Python:
 ```python
+# file: test.py
 import fibonacci
 import numpy as np
 
