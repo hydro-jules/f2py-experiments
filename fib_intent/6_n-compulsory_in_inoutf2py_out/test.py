@@ -4,8 +4,8 @@ import numpy as np
 
 n = 7
 
-a = np.zeros((n,), order='F', dtype=np.float32) + 1
-m = np.zeros((n,), order='F', dtype=np.float32) + 1
+a = np.ones((n,), order='F', dtype=np.float32)
+m = np.ones((n,), order='F', dtype=np.float32)
 
 m_, z = fibonacci.fib.series(n, a, m)
 

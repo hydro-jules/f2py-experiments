@@ -1,6 +1,6 @@
 # Experimenting with `numpy.f2py`
 
-This repository contains a few of small experiments to explore the interface to Fortran code offered by `numpy.f2py` in Python. To do so, the [example generating a Fibonacci series](https://docs.scipy.org/doc/numpy/f2py/getting-started.html) provided in the official documentation is used:
+This repository contains a few small experiments to explore the Python interface to Fortran code offered by `numpy.f2py`. To do so, the [example generating a Fibonacci series](https://docs.scipy.org/doc/numpy/f2py/getting-started.html) provided in the official documentation is used:
 
 ```fortran
 subroutine series(n, Z)

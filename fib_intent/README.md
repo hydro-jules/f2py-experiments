@@ -15,7 +15,7 @@ module fib
 
             integer, intent(in) :: n
             real, intent(out), dimension(n) :: Z
-            integer i
+            integer :: i
 
             do i = 1, n
                 if (i == 1) then
@@ -30,9 +30,9 @@ module fib
 end module fib
 ```
 
-From this Fortran source code, we will use `numpy.f2py` to create a static library that we will import in Python. First, we create a signature file to understand what interface to the Fortran code will be known on the Python side:
+From this Fortran source code, we will use `numpy.f2py` to create a static library that we will import in Python. First, we create a [signature file](https://docs.scipy.org/doc/numpy/f2py/signature-file.html) to understand what interface to the Fortran code will be known on the Python side (following the recommended [smart way](https://docs.scipy.org/doc/numpy/f2py/getting-started.html) of wrapping Fortran code):
 ```bash
-python -m numpy.f2py -m fibonacci -h fib.pyf --overwrite-signature fib.f90
+$ python -m numpy.f2py -m fibonacci -h fib.pyf --overwrite-signature fib.f90
 ```
 
 The created signature file looks like this:
@@ -51,11 +51,11 @@ python module fibonacci ! in
 end python module fibonacci
 ```
 
-We can see that the module to be imported in Python is named `fibonacci`, that it contains a Fortran module named `fib`, itself containing a Fortran subroutine named `series` that takes two arguments, an integer and an array of real numbers.
+We can see that the module to be imported in Python is named `fibonacci`, that it contains a Fortran module named `fib`, itself containing a Fortran subroutine named `series` that takes two arguments, an integer `n` and an array of real numbers `Z`.
 
-Now, we compile the Fortran program using the unmodified signature file that we have just created. The following instruction will generate a static library fibonacci.so:
+Now, we compile the Fortran program using the above unmodified signature file that we have just created. The following instruction will generate a static library fibonacci.so:
 ```bash
-python -m numpy.f2py -c fib.pyf fib.f90
+$ python -m numpy.f2py -c fib.pyf fib.f90
 ```
 
 Finally we can use this static library and import it just like a normal Python module:
@@ -71,14 +71,15 @@ print(z)
 
 We can notice that the array with `intent(out)` is not given as an argument to the function call, instead it is returned from the function call.
 
-If we run this python, this will output the following numpy array:
-```
+If we run this python script, this will output the following numpy array:
+```bash
+$ python test.py
 [ 0.  1.  1.  2.  3.  5.  8. 13. 21. 34. 55.]
 ```
 
 ### 2 - Providing an array as input
 
-The Fibonacci subroutine is now modified to take another input, a numpy array of dimension `n` that will be added to the generated Fibonacci series. This demonstrates a behaviour of `f2py` with array dimensions.
+The Fibonacci subroutine is now modified to take another input, a numpy array of dimension `n` that will be added to the generated Fibonacci series. This is to illustrate the behaviour of `f2py` with array dimensions.
 
 ```fortran
 ! file: fib.f90
@@ -93,7 +94,7 @@ module fib
             integer, intent(in) :: n
             real, intent(in), dimension(n) :: A
             real, intent(out), dimension(n) :: Z
-            integer i
+            integer :: i
 
             do i = 1, n
                 if (i == 1) then
@@ -113,7 +114,7 @@ module fib
 end module fib
 ```
 
-When generating the signature file, we can see that `f2py` created an interface where the dimension `n` becomes an optional argument, and it is inferred from the dimension of the input array `a`.
+When generating the signature file, we can see that `f2py` created an interface where the dimension `n` becomes an optional argument, and `n` is inferred from the dimension of the input array `a`:
 
 ```
 ! file: fib.pyf
@@ -131,7 +132,7 @@ python module fibonacci ! in
 end python module fibonacci
 ```
 
-Once the static library is compiled, we can use this interface to call the Fortran subroutine. Note that we use the keyword argument `order='F'` to create a Fortran-contiguous array that will be given as the input. The default behaviour of `numpy` is to create a C-contiguous array, so is not given a Fortran-contiguous array, `f2py` may create a copy of this array, which can become a problem for large multi-dimensional arrays. So it is safer to specify the order explicitly. 
+Once the static library is compiled, we can use this interface to call the Fortran subroutine. Note that we use the keyword argument `order='F'` to create a Fortran-contiguous array that will be given as the input. The default behaviour of `numpy` is to create a C-contiguous array, so is not giving a Fortran-contiguous array, and `f2py` may create a copy of this array, which can become a problem for large multi-dimensional arrays. So it is safer to specify the order explicitly. 
 
 ```python
 # file: test.py
@@ -139,7 +140,7 @@ import fibonacci
 import numpy as np
 
 n = 7
-a = np.zeros((n,), order='F', dtype=np.float32) + 1
+a = np.ones((n,), order='F', dtype=np.float32)
 
 # first option: let f2py infer the value of 'n' from the dimension of 'a'
 print('First option:')
@@ -153,20 +154,21 @@ z = fibonacci.fib.series(a, n=n)
 print(z)
 ```
 
-Both of the options above work and return a numpy array of dinension 'n':
+Both of the options above work and return a numpy array of dimension `n`:
 
-```
+```bash
+$ python test.py
 First option:
 [1. 2. 2. 3. 4. 6. 9.]
 Second option:
 [1. 2. 2. 3. 4. 6. 9.]
 ```
 
-However, if the value of 'n' given (e.g. n=8) is incompatible (because length of a is 7 < 8), an error is raised.
+However, if the value of `n` given (e.g. `n=8`) is incompatible (because length of `a` is 7 < 8), an error is raised.
 
 ### 3 - Providing an array as input and output
 
-In the previous example, the arguments of the function call are with intent(in), which means that they cannot be modified. `f2py` can also work with the intent(inout) of Fortran so that the given variables can be used and changed in the Fortran subroutine.
+In the previous example, the arguments of the function call are with `intent(in)`, which means that they cannot be modified. `f2py` can also work with the `intent(inout)` of Fortran so that the given variables can be used and changed in the Fortran subroutine. See, for example:
 
 ```fortran
 ! file: fib.f90
@@ -181,7 +183,7 @@ module fib
             integer, intent(in) :: n
             real, intent(inout), dimension(n) :: M
             real, intent(out), dimension(n) :: Z
-            integer i
+            integer :: i
 
             do i = 1, n
                 if (i == 1) then
@@ -201,7 +203,7 @@ module fib
 end module fib
 ```
 
-Again, the signature file shows that f2py turned the argument `n` as optional:
+Again, the signature file shows that `f2py` made the argument `n` optional:
 
 ```
 ! file: fib.pyf
@@ -219,7 +221,8 @@ python module fibonacci ! in
 end python module fibonacci
 ```
 
-When the static library is called in Python, we can see that the argument with intent(inout) initial values are used and modified:
+When the static library is called in Python, we can see that the argument with `intent(inout)` initial values are used and modified:
+
 ```python
 # file: test.py
 import fibonacci
@@ -227,7 +230,7 @@ import numpy as np
 
 
 n = 7
-m = np.zeros((n,), order='F', dtype=np.float32) + 1
+m = np.ones((n,), order='F', dtype=np.float32)
 
 print('First call of the subroutine:')
 z = fibonacci.fib.series(m, n=n)
@@ -238,8 +241,9 @@ z = fibonacci.fib.series(m, n=n)
 print(m)
 ```
 
-If we run the script below, we can see that each time the subroutine `series` is called, the variable `m` is updated (i.e. the Fibonacci series is added to its existing values):
-```
+If we run the script above, we can see that each time the subroutine `series` is called, the variable `m` is updated (i.e. the Fibonacci series is added to its existing values):
+```bash
+$ python test.py
 First call of the subroutine:
 [1. 2. 2. 3. 4. 6. 9.]
 Second call of the subroutine:
@@ -265,7 +269,7 @@ module fib
             real, intent(in), dimension(n) :: A
             real, intent(inout), dimension(n) :: M
             real, intent(out), dimension(n) :: Z
-            integer i
+            integer :: i
 
             do i = 1, n
                 if (i == 1) then
@@ -285,7 +289,7 @@ module fib
 end module fib
 ```
 
-The signature file (below) shows that `f2py` is, again, inferring the value of `n`, and it uses the first array argument of the call to the subroutine to do so (i.e. the input array `a`). If the intent(inout) array `m` were specified before the input array `a`, `m` would be used to infer the value of `n` instead.
+The signature file (below) shows that `f2py` is, again, inferring the value of `n`, and it uses the first array argument of the call to the subroutine to do so (i.e. the input array `a` here). If the `intent(inout)` array `m` were specified before the input array `a`, `m` would be used to infer the value of `n` instead.
 
 ```
 ! file: fib.pyf
@@ -304,13 +308,37 @@ python module fibonacci ! in
 end python module fibonacci
 ```
 
+After generating the static library, the following python can be used:
+```python
+# file: test.py
+import fibonacci
+import numpy as np
+
+n = 7
+
+a = np.ones((n,), order='F', dtype=np.float32)
+m = np.ones((n,), order='F', dtype=np.float32)
+
+z = fibonacci.fib.series(a, m, n=n)
+
+print(z)
+print(m)
+```
+
+And running it produces:
+```bash
+$ python test.py
+[0. 1. 1. 2. 3. 5. 8.]
+[ 2.  3.  3.  4.  5.  7. 10.]
+```
+
 ### 5 - Making the dimension of the arrays a required argument
 
-If one wants to make sure that the subroutine works on arrays of the expected dimension, rather than letting the subroutine infer the dimension from the first array given, two options are possible.
+If one wants to make sure that the subroutine works on arrays of the expected dimension, rather than letting the subroutine infer the dimension from the first array given, two options are possible: modify the Fortran source code, or modify the signature file.
 
 #### a - By modifying the Fortran source code
 
-To help `f2py` infer the right interface for the Fortran subroutine, comment lines starting with !f2py can be used. Because they are comments, they will be ignored by a Fortran compiler, but they will be read and used by `f2py`. By indicating that all the array arguments depend on the value of the variable `n`, the variable `n` cannot be optional anymore, and `f2py` will now expect for `n` to be provided when calling the subroutine.
+To help `f2py` infer the right interface for the Fortran subroutine, comment lines starting with `!f2py` can be used. Because they are comments, they will be ignored by a Fortran compiler, but they will be read and used when compiled with `f2py`. By indicating that all the array arguments depend on the value of the variable `n`, the variable `n` cannot be optional anymore, and `f2py` will now expect for `n` to be provided when calling the subroutine.
 
 ```fortran
 ! file: fib.f90
@@ -330,7 +358,7 @@ module fib
             !f2py depend(n) M
             real, intent(out), dimension(n) :: Z
             !f2py depend(n) Z
-            integer i
+            integer :: i
 
             do i = 1, n
                 if (i == 1) then
@@ -351,6 +379,7 @@ end module fib
 ```
 
 As can be seen in the signature file, the variable `n` is not flagged as optional anymore:
+
 ```
 ! file: fib.pyf
 
@@ -368,9 +397,9 @@ python module fibonacci ! in
 end python module fibonacci
 ```
 
-#### b - By changing the signature file
+#### b - By modifying the signature file
 
-If the Fortran source code cannot be modified to add the `f2py` comments, the fact that we are generating the static library in two steps allows us to tailor the interface to the Fortran subroutine. After the signature file is generated, and before the static library is compiled, the inferred interface can be adjusted manually directly in the signature file.
+If the Fortran source code cannot be modified to add the `f2py` comments, the fact that we are generating the static library in two steps (i.e. using the [smart way](https://docs.scipy.org/doc/numpy/f2py/getting-started.html)) allows us to tailor the interface to the Fortran subroutine. After the signature file is generated, and before the static library is compiled, the inferred interface can be adjusted manually directly in the signature file.
 
 If the automatically generated signature file is as follows:
 ```
@@ -408,14 +437,13 @@ python module fibonacci ! in
 end python module fibonacci
 ```
 
-The modified signature file can now be used to teach `f2py` what the interface to the subroutine should be, without ever having to modify the source code.
+The modified signature file can now be used to teach `f2py` how to interact with the subroutine, without ever having to modify the source code.
 
+### 6 - Getting the function call to return the `intent(inout)` variable(s) alongside the `intent(out)` variable(s)
 
-### 6 - Getting the function call to return the intent(inout) variable(s) alongside the intent(out) variable(s)
+When passing a variable as an argument with `intent(inout)` in the Fortran subroutine, the variable is modified in place. If, for some reason, one wants to get the call to the Fortran subroutine to return a pointer to the modified array, `f2py` defines a special `intent(in,out)` to do so. Again, similar to section 5, this can be done by adding comment lines in the Fortran source code, or by modifying the signature file.
 
-When passing a variable as an argument with `intent(inout)` in the Fortran subroutine, the variable is modified in place. If one wants to get the call to the Fortran subroutine to return a pointer to the modified array, `f2py` defines a special `intent(in,out)` to do so. Again, similar to section 5, this can be done by adding comment lines in the Fortran source code or by modifying the signature file.
-
-The modified source code:
+Here, for example, modifying the source code (by adding `!f2py` comments):
 ```fortran
 ! file: fib.f90
 
@@ -431,7 +459,7 @@ module fib
             real, intent(in), dimension(n) :: A
             !f2py depend(n) A
             real, intent(inout), dimension(n) :: M
-            !f2py intent(in,out,inplace) M
+            !f2py intent(in,out) M
             !f2py depend(n) M
             real, intent(out), dimension(n) :: Z
             !f2py depend(n) Z
@@ -455,7 +483,7 @@ module fib
 end module fib
 ``` 
 
-If the source code is modified, the automatically-generated source file will look like this:
+If the source code is modified (i.e. option a in section 5), the automatically-generated source file will look like this:
 
 ```
 ! file: fib.pyf
@@ -474,9 +502,9 @@ python module fibonacci ! in
 end python module fibonacci
 ```
 
-This is also how a signature file should be modified if the source code cannot be edited.
+This is also how a modified signature file should be if the source code cannot be edited (i.e. option b in section 5).
 
-Once the static library is generated, this is how it will behave with Python:
+Once the static library is generated, this is how it will behave in Python:
 ```python
 # file: test.py
 import fibonacci
@@ -484,8 +512,8 @@ import numpy as np
 
 n = 7
 
-a = np.zeros((n,), order='F', dtype=np.float32) + 1
-m = np.zeros((n,), order='F', dtype=np.float32) + 1
+a = np.ones((n,), order='F', dtype=np.float32)
+m = np.ones((n,), order='F', dtype=np.float32)
 
 m_, z = fibonacci.fib.series(n, a, m)
 
@@ -499,7 +527,8 @@ print(hex(id(m_)))
 ```
 
 This Python script will return:
-```
+```bash
+$ python test.py
 The array "m" and its memory address
 [ 2.  3.  3.  4.  5.  7. 10.]
 0x1014bb760

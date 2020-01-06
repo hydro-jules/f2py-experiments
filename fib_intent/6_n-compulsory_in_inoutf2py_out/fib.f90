@@ -3,7 +3,9 @@
 module fib
     contains
         subroutine series(n, A, M, Z)
-            ! calculates first n elements of the Fibonacci series
+            ! calculates first n elements of the Fibonacci series,
+            ! adds it to the existing input/output array, and adds the
+            ! input array to it
             implicit none
 
             integer, intent(in) :: n
