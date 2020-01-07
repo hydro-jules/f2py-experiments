@@ -1,4 +1,4 @@
-## Experimenting with the different Fortran and f2py intent options for subroutine arguments
+## Experimenting with the different Fortran and f2py intention options for subroutine array arguments
 
 ### 1 - Simple case with one input integer and one output array
 

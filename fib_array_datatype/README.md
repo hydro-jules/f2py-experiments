@@ -1,4 +1,4 @@
-## Experimenting with the different datatypes for Fortran subroutine numerical arguments
+## Experimenting with the different datatypes for Fortran subroutine array arguments
 
 To experiment with the behaviour of `f2py` with mismatch in datatypes between Python and Fortran arrays, the following Fortran subroutine based on the Fibonacci series example will be used (identical to the one used in section 5a of the [first experiment](../fib_array_intent)):
 
