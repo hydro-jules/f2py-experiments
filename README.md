@@ -23,9 +23,9 @@ subroutine series(n, Z)
 end subroutine series
 ```
 
-The [first experiment](./fib_intent) consists in exploring the different intents for Fortran subroutine arguments.
+The [first experiment](./fib_intent) consists in exploring the different intentions for Fortran subroutine array arguments.
 
-The [second experiment](./fib_array_datatype) consists in exploring the different datatypes for Fortran subroutine numerical arguments.
+The [second experiment](./fib_array_datatype) consists in exploring the different datatypes for Fortran subroutine array arguments.
 
 The [third experiment](./fib_alloc) consists in exploring the different ways of allocating memory for Fortran allocatable arrays.
 
