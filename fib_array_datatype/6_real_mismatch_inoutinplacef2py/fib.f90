@@ -12,7 +12,7 @@ module fib
             real, intent(in), dimension(n) :: A
             !f2py depend(n) A
             real, intent(inout), dimension(n) :: M
-            !f2py intent(in,out,inplace) M
+            !f2py intent(inplace) M
             !f2py depend(n) M
             real, intent(out), dimension(n) :: Z
             !f2py depend(n) Z

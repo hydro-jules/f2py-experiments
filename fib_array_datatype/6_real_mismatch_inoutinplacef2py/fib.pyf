@@ -7,7 +7,7 @@ python module fibonacci ! in
             subroutine series(n,a,m,z) ! in :fibonacci:fib.f90:fib
                 integer intent(in) :: n
                 real dimension(n),intent(in),depend(n) :: a
-                real dimension(n),intent(out,inplace),depend(n) :: m
+                real dimension(n),intent(inplace),depend(n) :: m
                 real dimension(n),intent(out),depend(n) :: z
             end subroutine series
         end module fib
