@@ -1,6 +1,6 @@
 ## Experimenting with the different datatypes for Fortran subroutine array arguments
 
-To experiment with the behaviour of `f2py` with mismatch in datatypes between Python and Fortran arrays, the following Fortran subroutine based on the Fibonacci series example will be used (identical to the one used in section 5a of the [first experiment](../fib_array_intent)):
+To experiment with the behaviour of `f2py` with mismatch in datatypes between Python and Fortran arrays, the following Fortran subroutine based on the Fibonacci series example will be used (identical to the one used in section 5a of the [first experiment](../1_fib_array_intent)):
 
 ```fortran
 ! file: fib.f90
@@ -225,7 +225,7 @@ This time the mismatch in datatypes resulted in an error. Since the array `m` ne
 
 ### 5 - Mismatch in datatype for the array with `intent(in,out)`
 
-`f2py` offers the possibility to define special intentions for variables that are specific to `f2py`. As introduced in section 6 of the [first experiment](../fib_array_intent), `!f2py intent(in,out)` can be used to return the `intent(inout)` variable, that would otherwise only be given as an input in a Python script.
+`f2py` offers the possibility to define special intentions for variables that are specific to `f2py`. As introduced in section 6 of the [first experiment](../1_fib_array_intent), `!f2py intent(in,out)` can be used to return the `intent(inout)` variable, that would otherwise only be given as an input in a Python script.
 
 This special `f2py` intent can be used to overcome the error encountered in section 4 (above). To do so, the Fortran source code presented in the foreword of this experiment needs to be modified to make use of the `intent(in,out)` for `M`:
 ```fortran
