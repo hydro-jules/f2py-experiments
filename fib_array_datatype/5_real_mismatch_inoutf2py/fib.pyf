@@ -1,0 +1,18 @@
+!    -*- f90 -*-
+! Note: the context of this file is case sensitive.
+
+python module fibonacci ! in 
+    interface  ! in :fibonacci
+        module fib ! in :fibonacci:fib.f90
+            subroutine series(n,a,m,z) ! in :fibonacci:fib.f90:fib
+                integer intent(in) :: n
+                real dimension(n),intent(in),depend(n) :: a
+                real dimension(n),intent(in,out),depend(n) :: m
+                real dimension(n),intent(out),depend(n) :: z
+            end subroutine series
+        end module fib
+    end interface 
+end python module fibonacci
+
+! This file was auto-generated with f2py (version:2).
+! See http://cens.ioc.ee/projects/f2py2e/
