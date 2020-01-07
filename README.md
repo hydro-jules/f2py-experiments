@@ -29,4 +29,4 @@ The [second experiment](./2_fib_array_datatype) consists in exploring the differ
 
 The [third experiment](./3_fib_array_alloc) consists in exploring the different ways of allocating memory for Fortran allocatable arrays.
 
-All experiments are conducted using Python 3.7, and numpy 1.17.3, and GNU Fortran 95 compiler 8.2.0.
+All experiments are conducted using Python 3.7.5, and numpy 1.17.3, and GNU Fortran 95 compiler 8.2.0.
