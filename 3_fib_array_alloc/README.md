@@ -1,4 +1,4 @@
-## Experimenting with the f2py and Fortran allocatble arrays
+## Experimenting with the f2py and Fortran allocatable arrays
 
 ### 1 - Allocate memory for Fortran allocatable arrays with Fortran
 
@@ -193,7 +193,7 @@ ___________ 2ND CALL ___________
 [ 2.  4.  4.  6.  8. 12. 18.]
 ```
 
-The same, expected, behaviour as in section 1 is now obtained without requiring an `init` subroutine in Fortran. The internal array `M` declared in the Fortran module can be allocated simply by assigning it a numpy array of the relevant dimension.
+The same, expected, behaviour as in section 1 is now obtained without requiring the invocation of the `init` subroutine in Fortran. The internal array `M` declared in the Fortran module can be allocated simply by assigning it a numpy array of the appropriate dimension.
 
 Note that when assigning and inspecting variables defined internally in the Fortran module, like above with the variable `M`, the default behaviour of `f2py` is to lower all cases as stated in its [documentation](https://numpy.org/devdocs/f2py/signature-file.html):
 > In general, the contents of signature files is case-sensitive. When scanning Fortran codes and writing a signature file, F2PY lowers all cases automatically except in multiline blocks or when --no-lower option is used.
