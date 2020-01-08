@@ -72,7 +72,7 @@ print(z)
 We can notice that the array with `intent(out)` is not given as an argument to the function call, instead it is returned from the function call.
 
 If we run this python script, this will output the following numpy array:
-```bash
+```text
 $ python test.py
 [ 0.  1.  1.  2.  3.  5.  8. 13. 21. 34. 55.]
 ```
@@ -156,7 +156,7 @@ print(z)
 
 Both of the options above work and return a numpy array of dimension `n`:
 
-```bash
+```text
 $ python test.py
 First option:
 [1. 2. 2. 3. 4. 6. 9.]
@@ -242,7 +242,7 @@ print(m)
 ```
 
 If we run the script above, we can see that each time the subroutine `series` is called, the variable `m` is updated (i.e. the Fibonacci series is added to its existing values):
-```bash
+```text
 $ python test.py
 First call of the subroutine:
 [1. 2. 2. 3. 4. 6. 9.]
@@ -326,7 +326,7 @@ print(m)
 ```
 
 And running it produces:
-```bash
+```text
 $ python test.py
 [0. 1. 1. 2. 3. 5. 8.]
 [ 2.  3.  3.  4.  5.  7. 10.]
@@ -527,7 +527,7 @@ print(hex(id(m_)))
 ```
 
 This Python script will return:
-```bash
+```text
 $ python test.py
 The array "m" and its memory address
 [ 2.  3.  3.  4.  5.  7. 10.]

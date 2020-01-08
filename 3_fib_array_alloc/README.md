@@ -102,7 +102,7 @@ print(fibonacci.fib.m)
 
 However, running this script yields an error:
 
-```bash
+```text
 $ python test1.py
 ___________ 1ST CALL ___________
 
@@ -140,7 +140,7 @@ print(fibonacci.fib.m)
 ```
 
 The following result is obtained:
-```bash
+```text
 $ python test2.py
 ___________ 1ST CALL ___________
 [0. 1. 1. 2. 3. 5. 8.]
@@ -183,7 +183,7 @@ print(z2)
 print(fibonacci.fib.m)
 ```
 
-```bash
+```text
 $ python test.py
 ___________ 1ST CALL ___________
 [0. 1. 1. 2. 3. 5. 8.]
@@ -261,7 +261,7 @@ print('Values in "m_": {!s}'.format(m_))
 
 When the script is executed, the following outputs are given:
 
-```bash
+```text
 $ python test.py
 
 ______ MEMORY ALLOCATION _______

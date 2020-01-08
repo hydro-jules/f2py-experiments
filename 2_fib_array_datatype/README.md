@@ -72,7 +72,7 @@ print(z.dtype)
 ```
 
 Now, running the python script above, we get:
-```bash
+```text
 $ python test.py
 [0. 1. 1. 2. 3. 5. 8.]
 float32
@@ -141,7 +141,7 @@ print(z.dtype)
 
 Which results in:
 Now, running the python script above, we get:
-```bash
+```text
 $ python test.py
 [0. 1. 1. 2. 3. 5. 8.]
 float64
@@ -172,7 +172,7 @@ print(z.dtype)
 ```
 
 Running this script yields the following output:
-```bash
+```text
 $ python test.py
 [1. 1. 1. 1. 1. 1. 1.]
 float64
@@ -192,6 +192,7 @@ Noteworthy, providing an input array of integers would result in the same behavi
 
 Re-using again the Fortran code in section 1, we now provide an array with `intent(inout)` containing 64-bit real numbers when Fortran is expecting 32-bit real numbers:
 ```python
+# file: test.py
 import fibonacci
 import numpy as np
 
@@ -214,7 +215,8 @@ print(z.dtype)
 ```
 
 Running this script results in the following error:
-```bash
+```text
+$ python test.py
 Traceback (most recent call last):
   File "~/f2py_experiments/fib_datatype/4_real_mismatch_inout/test.py", line 10, in <module>
     z = fibonacci.fib.series(n, a, m)
@@ -319,7 +321,7 @@ print(hex(id(m2)))
 ```
 
 Running this script yields:
-```bash
+```text
 $ python test.py
 The array "m0", its datatype, and its memory address before first call:
 [1. 1. 1. 1. 1. 1. 1.]
@@ -424,7 +426,7 @@ print(hex(id(m)))
 ```
 
 Running the above script results in:
-```bash
+```text
 $ python test.py
 The array "m", its datatype, and its memory address before call:
 [1. 1. 1. 1. 1. 1. 1.]
