@@ -1,6 +1,8 @@
 # Experimenting with `numpy.f2py`
 
-This repository contains a few small experiments to explore the Python interface to Fortran code offered by `numpy.f2py`. To do so, the [example generating a Fibonacci series](https://docs.scipy.org/doc/numpy/f2py/getting-started.html) provided in the official documentation is used:
+This repository contains a few small experiments to better understand the behaviour of `numpy.f2py` (shortened to `f2py` hereafter) when used to import into Python a functionality that is coded in Fortran.
+
+To do so, the [example of the Fibonacci series](https://docs.scipy.org/doc/numpy/f2py/getting-started.html) provided in the official documentation is used, where the first elements of the Fibonacci series are generated using a Fortran subroutine, and the subroutine is called from a Python script. The intiial subroutine used is the following:
 
 ```fortran
 subroutine series(n, Z)
@@ -23,10 +25,12 @@ subroutine series(n, Z)
 end subroutine series
 ```
 
-The [first experiment](./1_fib_array_intent) consists in exploring the different intentions for Fortran subroutine array arguments.
+This simple functionality coded in Fortran 90 will be used and complexified while going through the following three experiments:
 
-The [second experiment](./2_fib_array_datatype) consists in exploring the different datatypes for Fortran subroutine array arguments.
+* the [first experiment](./1_fib_array_intent) explores the different intentions for Fortran subroutine array arguments.
 
-The [third experiment](./3_fib_array_alloc) consists in exploring the different ways of allocating memory for Fortran allocatable arrays.
+* the [second experiment](./2_fib_array_datatype) explores the different datatypes for Fortran subroutine array arguments.
+
+* the [third experiment](./3_fib_array_alloc) explores the different ways of allocating memory for Fortran allocatable arrays.
 
 All experiments are conducted using Python 3.7.5, and numpy 1.17.3, and GNU Fortran 95 compiler 8.2.0.

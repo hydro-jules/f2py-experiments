@@ -2,7 +2,7 @@
 
 ### 1 - Allocating memory for Fortran allocatable arrays with Fortran
 
-The Fortran source code used in this experiment is based on the section 5a of the [first experiment](../1_fib_array_intent) where the subroutine `series` takes four arguments: the dimension of the arrays `n`, an input array `A`, an input/output array `M`, and an output array `Z`. However, this time we define the array `M` as an allocatable array in the module `fib`: it will not be required to provide it as an argument in the new interface to the module, rather it will remain a variable internal to the module. 
+The Fortran source code used in this third experiment is based on the section 5a of the [first experiment](../1_fib_array_intent) where the subroutine `series` takes four arguments: the dimension of the arrays `n`, an input array `A`, an input/output array `M`, and an output array `Z`. However, this time we define the array `M` as an allocatable array in the module `fib`: it will not be required to provide it as an argument in the new interface to the module, rather it will remain a variable internal to the module. 
 
 This new interface is given by the subroutine `calc`. It only takes `n`, `A`, and `Z` as arguments while using the array `M` declared internally in the module. Finally, a third subroutine `init` is defined to allocate memory for the array `M` and initialise it with zeros. The Fortran source code implementing these three subroutines is provided below: 
 
@@ -154,8 +154,7 @@ The expected behaviour is now achieved: the Fibonacci series is generated after 
 
 ### 2 - Allocating memory for Fortran allocatable arrays with Python
 
-The memory allocation of the allocatable array can also be done directly in Python. By re-using the Fortran code in the section 1 above, and once the static library is generated, the following Python script can be used: 
-
+The memory allocation of the allocatable array can also be done directly in Python. By reusing the Fortran code in the section 1 above, and once the static library is generated, the following Python script can be used: 
 ```python
 # file: test.py
 import fibonacci
@@ -183,6 +182,7 @@ print(z2)
 print(fibonacci.fib.m)
 ```
 
+When run, it yields:
 ```text
 $ python test.py
 ___________ 1ST CALL ___________
@@ -193,7 +193,7 @@ ___________ 2ND CALL ___________
 [ 2.  4.  4.  6.  8. 12. 18.]
 ```
 
-The same, expected, behaviour as in section 1 is now obtained without requiring the invocation of the `init` subroutine in Fortran. The internal array `M` declared in the Fortran module can be allocated simply by assigning it a numpy array of the appropriate dimension.
+The same, expected, behaviour as in section 1 is now obtained without requiring the invocation of the `init` subroutine in Fortran. The internal array `M` declared in the Fortran module can be allocated simply by assigning it a numpy array of the appropriate datatype and dimension.
 
 Note that when assigning and inspecting variables defined internally in the Fortran module, like above with the variable `M`, the default behaviour of `f2py` is to lower all cases as stated in its [documentation](https://numpy.org/devdocs/f2py/signature-file.html):
 > In general, the contents of signature files is case-sensitive. When scanning Fortran codes and writing a signature file, F2PY lowers all cases automatically except in multiline blocks or when --no-lower option is used.
@@ -240,6 +240,7 @@ print('Values in "m2": {!s}'.format(m2))
 print('\n_________ MODIFY "m1" __________')
 m1[0] = 0.0
 print('Values in "M": {!s}'.format(fibonacci.fib.m))
+print('Values in "m0": {!s}'.format(m0))
 print('Values in "m1": {!s}'.format(m1))
 print('Values in "m2": {!s}'.format(m2))
 print('Values in "m_": {!s}'.format(m_))
@@ -247,6 +248,7 @@ print('Values in "m_": {!s}'.format(m_))
 print('\n_________ MODIFY "m2" __________')
 m2[1] = 0.0
 print('Values in "M": {!s}'.format(fibonacci.fib.m))
+print('Values in "m0": {!s}'.format(m0))
 print('Values in "m1": {!s}'.format(m1))
 print('Values in "m2": {!s}'.format(m2))
 print('Values in "m_": {!s}'.format(m_))
@@ -254,13 +256,13 @@ print('Values in "m_": {!s}'.format(m_))
 print('\n_________ MODIFY "M" ___________')
 fibonacci.fib.m[2] = 0.0
 print('Values in "M": {!s}'.format(fibonacci.fib.m))
+print('Values in "m0": {!s}'.format(m0))
 print('Values in "m1": {!s}'.format(m1))
 print('Values in "m2": {!s}'.format(m2))
 print('Values in "m_": {!s}'.format(m_))
 ```
 
 When the script is executed, the following outputs are given:
-
 ```text
 $ python test.py
 
@@ -280,18 +282,21 @@ Values in "m2": [ 2.  4.  4.  6.  8. 12. 18.]
 
 _________ MODIFY "m1" __________
 Values in "M": [ 0.  4.  4.  6.  8. 12. 18.]
+Values in "m0": [ 0.  4.  4.  6.  8. 12. 18.]
 Values in "m1": [ 0.  4.  4.  6.  8. 12. 18.]
 Values in "m2": [ 0.  4.  4.  6.  8. 12. 18.]
 Values in "m_": [0. 0. 0. 0. 0. 0. 0.]
 
 _________ MODIFY "m2" __________
 Values in "M": [ 0.  0.  4.  6.  8. 12. 18.]
+Values in "m0": [ 0.  0.  4.  6.  8. 12. 18.]
 Values in "m1": [ 0.  0.  4.  6.  8. 12. 18.]
 Values in "m2": [ 0.  0.  4.  6.  8. 12. 18.]
 Values in "m_": [0. 0. 0. 0. 0. 0. 0.]
 
 _________ MODIFY "M" ___________
 Values in "M": [ 0.  0.  0.  6.  8. 12. 18.]
+Values in "m0": [ 0.  0.  0.  6.  8. 12. 18.]
 Values in "m1": [ 0.  0.  0.  6.  8. 12. 18.]
 Values in "m2": [ 0.  0.  0.  6.  8. 12. 18.]
 Values in "m_": [0. 0. 0. 0. 0. 0. 0.]
@@ -299,10 +304,16 @@ Values in "m_": [0. 0. 0. 0. 0. 0. 0.]
 
 After the memory allocation, the Fortran array `M` is retrieved, and `f2py` returns it as a numpy array that we assign to the variable `m0`. In this way, one can see that the array exists, is of the right dimension, and is initialised with zeros (as expected).
 
-Now, after calling the `calc` subroutine twice, we can explore how the memory addresses evolve. First, we can see that each time we retrieve the Fortran array `M`, it has a new memory address in Python. We will come back to this later. On the other hand, the memory address of `M` in Fortran is the same between the two calls. Also, one can notice by looking at the evolution of the values in `M` (through retrieving it in `m1`, then in `m2`) that they are updated as expected (i.e. it keeps memory of the state of `M` after the call to the subroutine `calc` that modifies `m`).
+Now, after calling the `calc` subroutine twice, we can explore how the memory addresses evolve. First, we can see that each time we retrieve the Fortran array `M`, it has a new memory address in Python (see `m0`, `m1`, and `m2`). We will come back to this later. On the other hand, the memory address of `M` in Fortran is the same between the two calls. Also, one can notice by looking at the evolution of the values in `M` (through retrieving it in `m1`, then in `m2`) that they are updated as expected (i.e. it keeps memory of the state of `M` after the call to the subroutine `calc` that modifies `m`).
 
 Note, the memory addresses in Fortran and in Python are not represented in the same way, so that they are not compared directly here.
 
-Now, by modifying successively `m1`, `m2`, and `M` directly, and looking at the evolution of the values in `M`, `m1`, and `m2`, we notice that when we modify an item in one, they are all modified at the same time. So why do `m0`, `m1`, and `m2` have different memory addresses then? This is because each time the Fortran array `M` is retrieved, `f2py` returns a new view of the same array, not a copy of the array. 
+Now, by modifying successively `m1`, `m2`, and `M` directly, and looking at the evolution of the values in `M`, `m0`, `m1`, and `m2`, we notice that when we modify an item in one, they are all modified at the same time. So why do `m0`, `m1`, and `m2` have different memory addresses then? This is because each time the Fortran array `M` is retrieved, `f2py` returns a new view of the same array, not a copy of the array. 
 
-Moreover, it is important to note that the values in `m_`, the original array that was used to allocate memory and initialise with zeros the Fortran array `M` is not modified. This means that `f2py` makes a copy of the data contained in the numpy array it is been given, rather than pointing to the inner data contained in the array given.
+Moreover, it is important to note that the values in `m_`, the original array that was used to allocate memory and to initialise with zeros the Fortran array `M` is not modified. This means that `f2py` makes a copy of the data contained in the numpy array it is been given, rather than pointing to the inner data contained in the array given. From a memory standpoint, it is then preferable to opt for the allocation of the memory with Fortran rather than with Python.
+
+### 4 - Lessons learnt
+
+* Allocatable arrays can be allocated memory and initialised with Python by assigning it a numpy array.
+* When inspecting an array defined only in Fortran, `f2py` returns a view of the array rather than a copy.
+* It is preferable to allocate memory for allocatable arrays in Fortran because it avoids the creation of a numpy array in Python only for its data to be copied to the Fortran array.

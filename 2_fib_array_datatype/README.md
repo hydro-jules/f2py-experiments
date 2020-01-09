@@ -1,6 +1,6 @@
 ## Experimenting with the different datatypes for Fortran subroutine array arguments
 
-To experiment with the behaviour of `f2py` with mismatch in datatypes between Python and Fortran arrays, the following Fortran subroutine based on the Fibonacci series example will be used (identical to the one used in section 5a of the [first experiment](../1_fib_array_intent)):
+To experiment with the behaviour of `f2py` when there exists mismatches in datatypes between Python and Fortran arrays, the following Fortran subroutine is used (identical to the one used in section 5a of the [first experiment](../1_fib_array_intent)):
 
 ```fortran
 ! file: fib.f90
@@ -49,11 +49,11 @@ $ python -m numpy.f2py -m fibonacci -h fib.pyf --overwrite-signature fib.f90
 $ python -m numpy.f2py -c fib.pyf fib.f90
 ```
 
-The following sections deal with mismatch in precision of floating point numbers, but the same conclusions apply to differences in precision for other type of numbers (e.g. between `np.int16` and `np.int32`), and across different type of numbers (e.g. casting from integers to floating point numbers).
+The following sections deal with mismatches in precision of floating point numbers, but the same conclusions apply to differences in precision for other type of numbers (e.g. between `np.int16` and `np.int32`), and across different type of numbers (e.g. casting from integers to floating point numbers).
 
 ### 1 - Array of 32-bit real numbers
 
-Using the static library generated (i.e. fibonacci.so), we can now call the `series` subroutine:
+Using the static library generated (i.e. *fibonacci.so*), we can now call the `series` subroutine:
 
 ```python
 # file: test.py
@@ -82,7 +82,7 @@ In this example, Fortran defines all of the arrays `intent(in)`, `intent(inout)`
 
 ### 2 - Array of 64-bit real numbers
 
-The same exercise is repeating with double precision floating point numbers occupying 64 bits of computer memory. These correspond to `double precision` and `np.float64` (or the Python built-in `float`), in Fortran and Python, respectively. The modified Fortran subroutine is as follows:
+The same exercise is repeated with double precision floating point numbers occupying 64 bits of computer memory. These correspond to `double precision` and `np.float64` (or the Python built-in `float`), in Fortran and Python, respectively. The modified Fortran subroutine is as follows:
 
 ```fortran
 ! file: fib.f90
@@ -147,7 +147,7 @@ $ python test.py
 float64
 ```
 
-### 3 - Mismatch in datatype for the array with `intent(in)`
+### 3 - Mismatch in datatypes for the array with `intent(in)`
 
 Re-using the Fortran code in section 1, we now provide an input array containing 64-bit real numbers when Fortran is expecting 32-bit real numbers:
 ```python
@@ -182,13 +182,13 @@ float32
 float32
 ```
 
-Surprisingly, the script terminates without any error despite the mismatch in datatypes for the input array `a`. This implies that `f2py` was able to cast the numpy array from 64-bit to 32-bit numbers. But, as can be seen the `dtype` of the array `a` is unchanged after the call of the subroutine `series`, which suggests that `f2py` created a copy of the array before carrying out the casting. The `dtype` of `m` is unchanged, while the returned array `z` is still containing 32-bit real numbers.
+Surprisingly, the script terminates without any error despite the mismatch in datatypes for the input array `a`. This implies that `f2py` was able to cast the numpy array from 64-bit to 32-bit numbers. But, as can be seen the `dtype` of the array `a` is unchanged after the call of the subroutine `series`. The `dtype` of `m` is unchanged, while the returned array `z` is still containing 32-bit real numbers.
 
-While this casting may be convenient, it can be assumed that it is safer to provide the appropriate datatype in the first place, or to carry out the casting in Python beforehand, in order to avoid any surprise.
+While this casting may be convenient, it is probably safer to provide the appropriate datatype in the first place, or to carry out the casting in Python beforehand, in order to avoid any surprise.
 
 Noteworthy, providing an input array of integers would result in the same behaviour as above (i.e. `f2py` would cast the integers to real numbers).
 
-### 4 - Mismatch in datatype for the array with `intent(inout)`
+### 4 - Mismatch in datatypes for the array with `intent(inout)`
 
 Re-using again the Fortran code in section 1, we now provide an array with `intent(inout)` containing 64-bit real numbers when Fortran is expecting 32-bit real numbers:
 ```python
@@ -223,9 +223,9 @@ Traceback (most recent call last):
 ValueError: failed to initialize intent(inout) array -- expected elsize=4 but got 8
 ```
 
-This time the mismatch in datatypes resulted in an error. Since the array `m` needs to be modified in place (because of the `intent(inout)` defined in Fortran), creating a copy of the array like for `intent(in)` in order to cast from 64-bit to 32-bit real numbers would not honour the expected behaviour of the Fortran subroutine, this is why `f2py` terminated the execution with an error.
+This time the mismatch in datatypes resulted in an error. Since the array `m` needs to be modified in place (because of the `intent(inout)` defined in Fortran), `f2py` prevents the implicit casting from 64-bit to 32-bit real numbers that was allowed when dealing with `intent(in)` arrays.
 
-### 5 - Mismatch in datatype for the array with `intent(in,out)`
+### 5 - Mismatch in datatypes for the array with `intent(in,out)`
 
 `f2py` offers the possibility to define special intentions for variables that are specific to `f2py`. As introduced in section 6 of the [first experiment](../1_fib_array_intent), `!f2py intent(in,out)` can be used to return the `intent(inout)` variable, that would otherwise only be given as an input in a Python script.
 
@@ -269,7 +269,7 @@ module fib
 end module fib
 ```
 
-Now, the following Python script is used to understand the behaviour for datatype mismatch with this special `intent`:
+Now, the following Python script is used to understand the behaviour for datatype mismatches with this special intention:
 
 ```python
 # file: test.py
@@ -353,13 +353,13 @@ float32
 
 The variable `m0` is initialised as an array of ones with the datatype `np.float64` (i.e. double precision), and given to the Fortran subroutine which is expecting a simple precision real numbers array. Unlike in section 4, no error was raised after the call to the `series` subroutine. However, one can notice that after the first call, the variable `m0` was not modified, instead the modifications are only provided in the returned variable `m1`, located at a different memory address, and with single precision. In other words, the `intent(inout)` variable was not modified in place, and a new array was created and returned.
 
-When we call the `series` subroutine a second time with this newly created variable `m1`, we now notice that the values in `m1` are now modified after the second call, and they match the values found in the returned variable `m2`. In fact, the memory address of `m2` is the same as of `m1`, i.e. `m2` is an alias for `m1`. In other words, during the second call of the subroutine, the `intent(inout)` variable was modified inplace, and the subroutine returned the existing array given as an input in the call.
+When we call the `series` subroutine a second time with this newly created array assigned to `m1`, we now notice that the values in `m1` are now modified after the second call, and they match the values found in the returned variable `m2`. In fact, the memory address of `m2` is the same as of `m1`, i.e. `m2` is an alias for `m1`. In other words, during the second call of the subroutine, the `intent(inout)` array was modified inplace, and the subroutine returned a pointer to the array given as an input in the call.
 
-Another approach would be to use only one variable `m` rather than the three variables `m1`, `m2`, and `m3`. Indeed, while `f2py` may return an array located at a different address because of the datatype mismatch after the first call, once the initial array with `dtype=np.float64` is not referenced by any variable anymore, its space in memory will automatically released by Python. However, given the fact that the space it occupies in memory will only be released for reuse in the Python session (i.e. not reusable by another application running on the computer), this can become a problem when dealing with large arrays, where the Python application will monopolise twice the memory space it actually needs.
+If only one variable `m` rather than the three variables `m1`, `m2`, and `m3` was used, once the initial array with `dtype=np.float64` is not referenced by any variable anymore (because `m` would be assigned the newly created array by `f2py` after the first call), its space in memory will automatically be released by Python. However, given the fact that the space it occupies in memory will only be released for reuse in the Python session (i.e. not reusable by another application running on the computer), this can become a problem when dealing with large arrays, where the Python application will monopolise twice the memory space it actually needs.
 
 ### 6 - Mismatch in datatype for the array with `intent(inplace)`
 
-However, `f2py` features another special intention `intent(inplace)` which can be used to overcome the problem of an unnecessary array created encountered in the first call of the `series` subroutine in section 5 above. Let's modify the Fortran source code to include this special attribute of `intent`:
+However, `f2py` features another special intention `intent(inplace)` which can be used to overcome the problem of an unnecessarily created array encountered in the first call of the `series` subroutine in section 5 above. Let's modify the Fortran source code to include this special intention instead of `intent(in,out)` previously used:
 ```fortran
 ! file: fib.f90
 
@@ -441,4 +441,11 @@ float32
 
 This time, the variable `m` is modified inplace: after the call to the `series` subroutine, both its datatype is cast to `np.float32`, and its items are modified accordingly as well.
 
-Note, if there is no mismatch in datatypes for `intent(inout)` initially, `intent(inplace)` is not required (as this was the case in sections 1 and 2).
+Note, if there is no mismatch in datatypes for `intent(inout)` initially, the use of `intent(in,out)` or `intent(inplace)` is not required, as experienced in Sections 1 and 2. Sections 5 and 6 are only provided to better understand the behaviour of `f2py` and its special intentions for variables.
+
+It is strongly recommended to use matching datatypes between the Python and the Fortran sides in order to avoid execution errors or memory issues due to unnecessarily created arrays.
+
+### 4 - Lessons learnt
+
+* As long as there is not mismatch in datatypes, `f2py` does not create unnecessary copies of arrays.
+* If there is a datatype mismatch, `intent(in)` arrays are silently cast by `f2py` to the datatype the Fortran subroutine is expecting, while `intent(inout) arrays are not.

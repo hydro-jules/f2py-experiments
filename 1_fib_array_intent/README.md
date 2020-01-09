@@ -2,7 +2,7 @@
 
 ### 1 - Simple case with one input integer and one output array
 
-The Fortran subroutine that we will use takes only the required length `n` of the Fibonacci series, and it returns this series as an array:
+The initial Fortran subroutine that we will use takes only the required length `n` of the Fibonacci series, and it returns this series as an array:
 
 ```fortran
 ! file: fib.f90
@@ -228,7 +228,6 @@ When the static library is called in Python, we can see that the argument with `
 import fibonacci
 import numpy as np
 
-
 n = 7
 m = np.ones((n,), order='F', dtype=np.float32)
 
@@ -441,7 +440,7 @@ The modified signature file can now be used to teach `f2py` how to interact with
 
 ### 6 - Getting the function call to return the `intent(inout)` variable(s) alongside the `intent(out)` variable(s)
 
-When passing a variable as an argument with `intent(inout)` in the Fortran subroutine, the variable is modified in place. If, for some reason, one wants to get the call to the Fortran subroutine to return a pointer to the modified array, `f2py` defines a special `intent(in,out)` to do so. Again, similar to section 5, this can be done by adding comment lines in the Fortran source code, or by modifying the signature file.
+When passing a variable as an argument with `intent(inout)` in the Fortran subroutine, the variable is modified in place. If, for some reason, one wants to get the call to the Fortran subroutine to return the modified array, `f2py` defines a special `intent(in,out)` to do so. Again, similar to section 5, this can be done by adding comment lines in the Fortran source code, or by modifying the signature file.
 
 Here, for example, modifying the source code (by adding `!f2py` comments):
 ```fortran
@@ -537,4 +536,4 @@ The array "m_" and its memory address
 0x1014bb760
 ```
 
-As one can notice, the address in memory of the variables `m` and `m_` is the same, i.e. `m_` is an alias for `m`.
+It can be noticed that the addresses in memory of the variables `m` and `m_` are the same, i.e. `m_` is an alias for `m`. So `f2py` did not return a copy of the `intent(inout)` array, rather it returned a pointer to the existing array.
