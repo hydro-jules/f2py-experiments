@@ -218,9 +218,14 @@ n = 7
 
 a = np.ones((n,), order='F', dtype=np.float32)
 
-print('\n______ MEMORY ALLOCATION _______')
-m_ = np.zeros((n,), order='F', dtype=np.float32)
-fibonacci.fib.m = m_
+print('\n___ BEFORE MEMORY ALLOCATION ____')
+mb = fibonacci.fib.m
+print('Memory address of "m_" (Python): {}'.format(hex(id(mb))))
+print('Values in "m_": {!s}'.format(mb))
+
+print('\n___ AFTER MEMORY ALLOCATION _____')
+ma = np.zeros((n,), order='F', dtype=np.float32)
+fibonacci.fib.m = ma
 m0 = fibonacci.fib.m
 print('Memory address of "m0" (Python): {}'.format(hex(id(m0))))
 print('Values in "m0": {!s}'.format(m0))
@@ -228,92 +233,114 @@ print('Values in "m0": {!s}'.format(m0))
 print('\n___________ 1ST CALL ___________')
 z1 = fibonacci.fib.calc(n, a)
 m1 = fibonacci.fib.m
-print('Memory address of "m1" (Python): {}'.format(hex(id(m1))))
+print('Memory address of "m1" (Python): {}'.format(id(m1)))
 print('Values in "m1": {!s}'.format(m1))
 
 print('\n___________ 2ND CALL ___________')
 z2 = fibonacci.fib.calc(n, a)
 m2 = fibonacci.fib.m
-print('Memory address of "m2" (Python): {}'.format(hex(id(m2))))
+print('Memory address of "m2" (Python): {}'.format(id(m2)))
 print('Values in "m2": {!s}'.format(m2))
 
-print('\n_________ MODIFY "m1" __________')
-m1[0] = 0.0
+print('\n________ MODIFY ARRAYS _________')
+m1[0] = -1.0
+m2[1] = -2.0
+fibonacci.fib.m[2] = -3.0
+
+print('Values in "ma": {!s}'.format(ma))
 print('Values in "M": {!s}'.format(fibonacci.fib.m))
 print('Values in "m0": {!s}'.format(m0))
 print('Values in "m1": {!s}'.format(m1))
 print('Values in "m2": {!s}'.format(m2))
-print('Values in "m_": {!s}'.format(m_))
 
-print('\n_________ MODIFY "m2" __________')
-m2[1] = 0.0
-print('Values in "M": {!s}'.format(fibonacci.fib.m))
-print('Values in "m0": {!s}'.format(m0))
-print('Values in "m1": {!s}'.format(m1))
-print('Values in "m2": {!s}'.format(m2))
-print('Values in "m_": {!s}'.format(m_))
+print('\n__ VIEWS OF THE SAME ARRAY ? __')
+print('Does "m0" own its own memory? {}'.format(m0.base is None))
+print('Does "m1" own its own memory? {}'.format(m1.base is None))
+print('Does "m2" own its own memory? {}'.format(m2.base is None))
 
-print('\n_________ MODIFY "M" ___________')
-fibonacci.fib.m[2] = 0.0
-print('Values in "M": {!s}'.format(fibonacci.fib.m))
-print('Values in "m0": {!s}'.format(m0))
-print('Values in "m1": {!s}'.format(m1))
-print('Values in "m2": {!s}'.format(m2))
-print('Values in "m_": {!s}'.format(m_))
+print('\n______ SHARING MEMORY ? _______')
+print('Do "m0" and "m1" share memory? {}'.format(np.shares_memory(m0, m1)))
+print('Do "m1" and "m2" share memory? {}'.format(np.shares_memory(m1, m2)))
+print('Do "m0" and "m2" share memory? {}'.format(np.shares_memory(m0, m2)))
+
+print('\n___ POINTING TO SAME DATA ? ___')
+print('The area storing the first element of data for "m0": {}'.format(m0.__array_interface__['data'][0]))
+print('The area storing the first element of data for "m1": {}'.format(m1.__array_interface__['data'][0]))
+print('The area storing the first element of data for "m2": {}'.format(m2.__array_interface__['data'][0]))
+print('The area storing the first element of data for "ma": {}'.format(ma.__array_interface__['data'][0]))
 ```
 
 When the script is executed, the following outputs are given:
 ```text
 $ python test.py
 
-______ MEMORY ALLOCATION _______
-Memory address of "m0" (Python): 0x10a54f8a0
+___ BEFORE MEMORY ALLOCATION ____
+Memory address of "m_" (Python): 0x10e9fa058
+Values in "m_": None
+
+___ AFTER MEMORY ALLOCATION _____
+Memory address of "m0" (Python): 0x10ecf5da0
 Values in "m0": [0. 0. 0. 0. 0. 0. 0.]
 
 ___________ 1ST CALL ___________
-Memory address of "M" (Fortran): 7FEFFBD441D0
-Memory address of "m1" (Python): 0x10a54f990
+Memory address of "M" (Fortran): 140256456790048
+Memory address of "m1" (Python): 4666664080
 Values in "m1": [1. 2. 2. 3. 4. 6. 9.]
 
 ___________ 2ND CALL ___________
-Memory address of "M" (Fortran): 7FEFFBD441D0
-Memory address of "m2" (Python): 0x10bd05da0
+Memory address of "M" (Fortran): 140256456790048
+Memory address of "m2" (Python): 4666654112
 Values in "m2": [ 2.  4.  4.  6.  8. 12. 18.]
 
-_________ MODIFY "m1" __________
-Values in "M": [ 0.  4.  4.  6.  8. 12. 18.]
-Values in "m0": [ 0.  4.  4.  6.  8. 12. 18.]
-Values in "m1": [ 0.  4.  4.  6.  8. 12. 18.]
-Values in "m2": [ 0.  4.  4.  6.  8. 12. 18.]
-Values in "m_": [0. 0. 0. 0. 0. 0. 0.]
+________ MODIFY ARRAYS _________
+Values in "ma": [0. 0. 0. 0. 0. 0. 0.]
+Values in "M": [-1. -2. -3.  6.  8. 12. 18.]
+Values in "m0": [-1. -2. -3.  6.  8. 12. 18.]
+Values in "m1": [-1. -2. -3.  6.  8. 12. 18.]
+Values in "m2": [-1. -2. -3.  6.  8. 12. 18.]
 
-_________ MODIFY "m2" __________
-Values in "M": [ 0.  0.  4.  6.  8. 12. 18.]
-Values in "m0": [ 0.  0.  4.  6.  8. 12. 18.]
-Values in "m1": [ 0.  0.  4.  6.  8. 12. 18.]
-Values in "m2": [ 0.  0.  4.  6.  8. 12. 18.]
-Values in "m_": [0. 0. 0. 0. 0. 0. 0.]
+__ VIEWS OF THE SAME ARRAY ? __
+Does "m0" own its own memory? True
+Does "m1" own its own memory? True
+Does "m2" own its own memory? True
 
-_________ MODIFY "M" ___________
-Values in "M": [ 0.  0.  0.  6.  8. 12. 18.]
-Values in "m0": [ 0.  0.  0.  6.  8. 12. 18.]
-Values in "m1": [ 0.  0.  0.  6.  8. 12. 18.]
-Values in "m2": [ 0.  0.  0.  6.  8. 12. 18.]
-Values in "m_": [0. 0. 0. 0. 0. 0. 0.]
+______ SHARING MEMORY ? _______
+Do "m0" and "m1" share memory? True
+Do "m1" and "m2" share memory? True
+Do "m0" and "m2" share memory? True
+
+___ POINTING TO SAME DATA ? ___
+The area storing the first element of data for "m0": 140256456790048
+The area storing the first element of data for "m1": 140256456790048
+The area storing the first element of data for "m2": 140256456790048
+The area storing the first element of data for "ma": 140256457034512
 ```
 
-After the memory allocation, the Fortran array `M` is retrieved, and `f2py` returns it as a numpy array that we assign to the variable `m0`. In this way, one can see that the array exists, is of the right dimension, and is initialised with zeros (as expected).
+Let's go through this, step by step, first looking at the values in the array `M`, then looking at the memory location of the array.
 
-Now, after calling the `calc` subroutine twice, we can explore how the memory addresses evolve. First, we can see that each time we retrieve the Fortran array `M`, it has a new memory address in Python (see `m0`, `m1`, and `m2`). We will come back to this later. On the other hand, the memory address of `M` in Fortran is the same between the two calls. Also, one can notice by looking at the evolution of the values in `M` (through retrieving it in `m1`, then in `m2`) that they are updated as expected (i.e. it keeps memory of the state of `M` after the call to the subroutine `calc` that modifies `m`).
+In terms of values:
+* Before the memory allocation, the Fortran array `M` is retrieved using `fibonacci.fib.m`, but it returns None, because no memory was allocated for the allocatable array yet.
 
-Note, the memory addresses in Fortran and in Python are not represented in the same way, so that they are not compared directly here.
+* After the memory allocation, the Fortran array `M` is retrieved using `fibonacci.fib.m`, `f2py` returns a numpy array which is assigned to the variable `m0`: an array now exists, it is of the right dimension, and it is initialised with zeros (as expected). 
 
-Now, by modifying successively `m1`, `m2`, and `M` directly, and looking at the evolution of the values in `M`, `m0`, `m1`, and `m2`, we notice that when we modify an item in one, they are all modified at the same time. So why do `m0`, `m1`, and `m2` have different memory addresses then? This is because each time the Fortran array `M` is retrieved, `f2py` returns a new view of the same array, not a copy of the array. 
+* After calling the `calc` subroutine twice (see sections *"1st call"* and *"second call"* above), one can notice that the values in the array `M` are modified accordingly, i.e. it keeps memory of the state of `M` after the previous call to the subroutine `calc` to calculate its new state.
 
-Moreover, it is important to note that the values in `m_`, the original array that was used to allocate memory and to initialise with zeros the Fortran array `M` is not modified. This means that `f2py` makes a copy of the data contained in the numpy array it is been given, rather than pointing to the inner data contained in the array given. From a memory standpoint, it is then preferable to opt for the allocation of the memory with Fortran rather than with Python.
+* By modifying successively `m1`, `m2`, and `M` directly (see section *"modify arrays"* above), and looking at the evolution of the values in `M`, `m0`, `m1`, and `m2`, we notice that when we modify an item in one, they are all modified at the same time. 
+
+* Moreover, it is important to note that the values in `mb`, the original array that was used to allocate memory and to initialise with zeros the Fortran array `M` is not modified. This means that `f2py` makes a copy of the data contained in the numpy array it is been given, rather than pointing to the inner data contained in the numpy array given. From a memory standpoint, it is then preferable to opt for the allocation of the memory with Fortran rather than with Python.
+
+Now, we can explore how the memory addresses evolve. First, we can see that each time we retrieve the Fortran array `M` using `fibonacci.fib.m`, it has a new memory address in Python (see `id(m0)`, `id(m1)`, and `id(m2)`), i.e. it instantiates a new object rather than aliasing an existing one. On the other hand, the memory address of `M` in Fortran is the same between the two calls.
+
+After modifying one item in `m1`, `m2`, and `M`, we saw that `M`, `m0`, `m1`, and `m2` were all modified as a result. So why do `m0`, `m1`, and `m2` have different memory addresses then? One could assume that `f2py` returns a [view](https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.view.html) of the same numpy array. But, by looking at the [base attribute](https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.base.html#numpy.ndarray.base) of these numpy arrays (see section *"views of the same array?"* above), we can see that all of them own their own memory, so they are not views because a view has a base evaluating to another numpy array (not `None`). 
+
+However, when using the [numpy.shares_memory](https://docs.scipy.org/doc/numpy/reference/generated/numpy.shares_memory.html) method, it indicates that they do share memory. This is confirmed when looking at the item [data](https://docs.scipy.org/doc/numpy/reference/arrays.interface.html#__array_interface__) in the array interface of each of these arrays, their first element of data are all at same memory location. This explains why they are all modified when one of them is modified. Moreover, this memory location is indeed the same as the memory location of the Fortran array. So, it proves that `f2py` does not create unnecessary copies of the data.
+
+The item data for the variable `ma` also confirms that its inner data array is distinct from the inner data array of the Fortran array `M`. This is why it remains pristine despite the two calls to the `calc` subroutine, and the subsequent manual modifications to it.
+
+To wrap up, `f2py` returns a new numpy.ndarray each time the Fortran array `M` is inspected in Python, for numpy it is not a view of another array (according to the base attribute), yet it behaves just like one because it shares the memory of the inner data array it points to (according to the item data in the \_\_array_interface\_\_ dictionary).
 
 ### 4 - Lessons learnt
 
 * Allocatable arrays can be allocated memory and initialised with Python by assigning it a numpy array.
-* When inspecting an array defined only in Fortran, `f2py` returns a view of the array rather than a copy.
+* When inspecting an array defined only in Fortran, `f2py` returns a new numpy array object, but the inner data array in this object points to memory area of the array allocated in Fortran.
 * It is preferable to allocate memory for allocatable arrays in Fortran because it avoids the creation of a numpy array in Python only for its data to be copied to the Fortran array.

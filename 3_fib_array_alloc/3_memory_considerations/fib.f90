@@ -60,7 +60,7 @@ module fib
                 M(i) = M(i) + A(i) + Z(i)
             end do
 
-            print '(A, Z0)', 'Memory address of "M" (Fortran): ', loc(M)
+            print '(A, I15)', 'Memory address of "M" (Fortran): ', loc(M)
 
         end subroutine series
 
