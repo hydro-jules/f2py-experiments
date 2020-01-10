@@ -448,4 +448,4 @@ It is strongly recommended to use matching datatypes between the Python and the 
 ### 4 - Lessons learnt
 
 * As long as there is not mismatch in datatypes, `f2py` does not create unnecessary copies of arrays.
-* If there is a datatype mismatch, `intent(in)` arrays are silently cast by `f2py` to the datatype the Fortran subroutine is expecting, while `intent(inout) arrays are not.
+* If there is a datatype mismatch, `intent(in)` arrays are silently cast by `f2py` to the datatype the Fortran subroutine is expecting, while `intent(inout)` arrays are not.
