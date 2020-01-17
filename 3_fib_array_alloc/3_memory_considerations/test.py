@@ -8,14 +8,14 @@ a = np.ones((n,), order='F', dtype=np.float32)
 
 print('\n___ BEFORE MEMORY ALLOCATION ____')
 mb = fibonacci.fib.m
-print('Memory address of "mb" (Python): {}'.format(hex(id(mb))))
+print('Memory address of "mb" (Python): {}'.format(id(mb)))
 print('Values in "mb": {!s}'.format(mb))
 
 print('\n___ AFTER MEMORY ALLOCATION _____')
 ma = np.zeros((n,), order='F', dtype=np.float32)
 fibonacci.fib.m = ma
 m0 = fibonacci.fib.m
-print('Memory address of "m0" (Python): {}'.format(hex(id(m0))))
+print('Memory address of "m0" (Python): {}'.format(id(m0)))
 print('Values in "m0": {!s}'.format(m0))
 
 print('\n___________ 1ST CALL ___________')

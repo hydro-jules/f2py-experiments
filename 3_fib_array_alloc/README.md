@@ -220,14 +220,14 @@ a = np.ones((n,), order='F', dtype=np.float32)
 
 print('\n___ BEFORE MEMORY ALLOCATION ____')
 mb = fibonacci.fib.m
-print('Memory address of "mb" (Python): {}'.format(hex(id(mb))))
+print('Memory address of "mb" (Python): {}'.format(id(mb)))
 print('Values in "mb": {!s}'.format(mb))
 
 print('\n___ AFTER MEMORY ALLOCATION _____')
 ma = np.zeros((n,), order='F', dtype=np.float32)
 fibonacci.fib.m = ma
 m0 = fibonacci.fib.m
-print('Memory address of "m0" (Python): {}'.format(hex(id(m0))))
+print('Memory address of "m0" (Python): {}'.format(id(m0)))
 print('Values in "m0": {!s}'.format(m0))
 
 print('\n___________ 1ST CALL ___________')
@@ -275,21 +275,21 @@ When the script is executed, the following outputs are given:
 $ python test.py
 
 ___ BEFORE MEMORY ALLOCATION ____
-Memory address of "mb" (Python): 0x10e9fa058
+Memory address of "mb" (Python): 4515139672
 Values in "mb": None
 
 ___ AFTER MEMORY ALLOCATION _____
-Memory address of "m0" (Python): 0x10ecf5da0
+Memory address of "m0" (Python): 4518243744
 Values in "m0": [0. 0. 0. 0. 0. 0. 0.]
 
 ___________ 1ST CALL ___________
-Memory address of "M" (Fortran): 140256456790048
-Memory address of "m1" (Python): 4666664080
+Memory address of "M" (Fortran): 140598545023104
+Memory address of "m1" (Python): 4606792688
 Values in "m1": [1. 2. 2. 3. 4. 6. 9.]
 
 ___________ 2ND CALL ___________
-Memory address of "M" (Fortran): 140256456790048
-Memory address of "m2" (Python): 4666654112
+Memory address of "M" (Fortran): 140598545023104
+Memory address of "m2" (Python): 4606782720
 Values in "m2": [ 2.  4.  4.  6.  8. 12. 18.]
 
 ________ MODIFY ARRAYS _________
@@ -310,10 +310,10 @@ Do "m1" and "m2" share memory? True
 Do "m0" and "m2" share memory? True
 
 ___ POINTING TO SAME DATA ? ___
-The area storing the first element of data for "m0": 140256456790048
-The area storing the first element of data for "m1": 140256456790048
-The area storing the first element of data for "m2": 140256456790048
-The area storing the first element of data for "ma": 140256457034512
+The area storing the first element of data for "m0": 140598545023104
+The area storing the first element of data for "m1": 140598545023104
+The area storing the first element of data for "m2": 140598545023104
+The area storing the first element of data for "ma": 140598545056896
 ```
 
 Let's go through this, step by step, first looking at the values in the array `M`, then looking at the memory location of the array.
