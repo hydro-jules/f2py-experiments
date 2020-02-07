@@ -166,9 +166,9 @@ Second option:
 
 However, if the value of `n` given (e.g. `n=8`) is incompatible (because length of `a` is 7 < 8), an error is raised.
 
-### 3 - Providing an array as input and output
+### 3 - Providing an array as input/output
 
-In the previous example, the arguments of the function call are with `intent(in)`, which means that they cannot be modified. `f2py` can also work with the `intent(inout)` of Fortran so that the given variables can be used and changed in the Fortran subroutine. See, for example:
+`f2py` can also work with the `intent(inout)` of Fortran so that the given variables can be read and modified in the Fortran subroutine. See, for example:
 
 ```fortran
 ! file: fib.f90
@@ -221,7 +221,7 @@ python module fibonacci ! in
 end python module fibonacci
 ```
 
-When the static library is called in Python, we can see that the argument with `intent(inout)` initial values are used and modified:
+When the static library is called in Python, we can see that the argument with `intent(inout)` initial values are read and modified:
 
 ```python
 # file: test.py
