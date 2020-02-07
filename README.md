@@ -2,7 +2,7 @@
 
 This repository contains a few small experiments to better understand the behaviour of `numpy.f2py` (shortened to `f2py` hereafter) when used to import into Python a functionality that is coded in Fortran.
 
-To do so, the [example of the Fibonacci series](https://docs.scipy.org/doc/numpy/f2py/getting-started.html) provided in the official documentation is used, where the first elements of the Fibonacci series are generated using a Fortran subroutine, and the subroutine is called from a Python script. The intiial subroutine used is the following:
+To do so, the [example of the Fibonacci series](https://docs.scipy.org/doc/numpy/f2py/getting-started.html) provided in the official documentation is used as the functionality to be imported, where the first elements of the Fibonacci series are generated using a Fortran subroutine, and the subroutine is called from a Python script. The initial subroutine used is the following:
 
 ```fortran
 subroutine series(n, Z)
