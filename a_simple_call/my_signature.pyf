@@ -1,0 +1,22 @@
+!    -*- f90 -*-
+! Note: the context of this file is case sensitive.
+
+python module my_package ! in 
+    interface  ! in :my_package
+        subroutine add_scalar(n,an_array,a_scalar,the_result) ! in :my_package:my_file.f90
+            integer, optional,intent(in),check(len(an_array)>=n),depend(an_array) :: n=len(an_array)
+            real dimension(n),intent(in) :: an_array
+            real intent(in) :: a_scalar
+            real dimension(n),intent(out),depend(n) :: the_result
+        end subroutine add_scalar
+        subroutine add_array(n,array_one,array_two,the_result) ! in :my_package:my_file.f90
+            integer, optional,intent(in),check(len(array_one)>=n),depend(array_one) :: n=len(array_one)
+            real dimension(n),intent(in) :: array_one
+            real dimension(n),intent(in),depend(n) :: array_two
+            real dimension(n),intent(out),depend(n) :: the_result
+        end subroutine add_array
+    end interface 
+end python module my_package
+
+! This file was auto-generated with f2py (version:2).
+! See http://cens.ioc.ee/projects/f2py2e/
